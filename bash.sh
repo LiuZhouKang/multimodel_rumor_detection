@@ -1,5 +1,8 @@
 ###记得根据自己的需要来修改这里面的参数！！！关注注意事项！！！
 
+# 处理整个目录 + 指定输出目录
+python image_repair.py --input image-verification-corpus\images --output repaired_images
+
 #进行数据集的处理
 python data_prepare.py --ratio 0.2 --data_from weibo #ratio用于处理的数据集占总数据集的比例(默认"0.2")，data_from表示数据集的来源(默认"weibo")
 
