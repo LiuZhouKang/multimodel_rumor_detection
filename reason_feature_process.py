@@ -5,6 +5,10 @@ from cn_clip.clip import load_from_name, tokenize
 import argparse
 from tqdm import tqdm
 import numpy as np
+import os
+
+if not os.path.exists('reason_feature'):
+    os.makedirs('reason_feature')  # 递归创建文件夹（如果父目录不存在也会创建）
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_from', type=str, default='weibo', help='数据集来源 (默认: weibo)')
@@ -69,26 +73,41 @@ def extract_text_features(texts: List[str], data_from: str, batch_size: int = 64
 
 # 使用示例
 if __name__ == "__main__":
-    # 英文文本示例
-    print("\n---------------1.处理训练集中文本理由部分数据---------------")
-    train_text_reason_feature = extract_text_features(train_text_reason, data_from=args.data_from)
-    # print(train_text_reason_feature.shape)
-    print("---------------2.处理测试集中文本理由部分数据---------------")
-    test_text_reason_feature = extract_text_features(test_text_reason, data_from=args.data_from)
-    # print(test_text_reason_feature.shape)
-    print("---------------3.处理训练集中图像理由部分数据---------------")
-    train_image_reason_feature = extract_text_features(train_image_reason, data_from=args.data_from)
-    # print(train_image_reason_feature.shape)
-    print("---------------4.处理测试集中图像理由部分数据---------------")
-    test_image_reason_feature = extract_text_features(test_image_reason, data_from=args.data_from)
-    # print(test_image_reason_feature.shape)
+    # # 英文文本示例
+    # print("\n---------------1.处理训练集中文本理由部分数据---------------")
+    # train_text_reason_feature = extract_text_features(train_text_reason, data_from=args.data_from)
+    # # print(train_text_reason_feature.shape)
+    # print("---------------2.处理测试集中文本理由部分数据---------------")
+    # test_text_reason_feature = extract_text_features(test_text_reason, data_from=args.data_from)
+    # # print(test_text_reason_feature.shape)
+    # print("---------------3.处理训练集中图像理由部分数据---------------")
+    # train_image_reason_feature = extract_text_features(train_image_reason, data_from=args.data_from)
+    # # print(train_image_reason_feature.shape)
+    # print("---------------4.处理测试集中图像理由部分数据---------------")
+    # test_image_reason_feature = extract_text_features(test_image_reason, data_from=args.data_from)
+    # # print(test_image_reason_feature.shape)
     
 
-    # 保存四个列表为 .npy 文件
-    np.save('reason_feature/train_text_reason_feature.npy', np.array(train_text_reason_feature))
-    np.save('reason_feature/test_text_reason_feature.npy', np.array(test_text_reason_feature))
-    np.save('reason_feature/train_image_reason_feature.npy', np.array(train_image_reason_feature))
-    np.save('reason_feature/test_image_reason_feature.npy', np.array(test_image_reason_feature))
+    # # 保存四个列表为 .npy 文件
+    # np.save('reason_feature/train_text_reason_feature.npy', np.array(train_text_reason_feature))
+    # np.save('reason_feature/test_text_reason_feature.npy', np.array(test_text_reason_feature))
+    # np.save('reason_feature/train_image_reason_feature.npy', np.array(train_image_reason_feature))
+    # np.save('reason_feature/test_image_reason_feature.npy', np.array(test_image_reason_feature))
+    print("\n---------------1.处理训练集中文本理由部分数据---------------")
+    # 拆分特征和损失
+    train_text_feat, train_text_loss = extract_text_features(train_text_reason, data_from=args.data_from)
+    print("---------------2.处理测试集中文本理由部分数据---------------")
+    test_text_feat, test_text_loss = extract_text_features(test_text_reason, data_from=args.data_from)
+    print("---------------3.处理训练集中图像理由部分数据---------------")
+    train_image_feat, train_image_loss = extract_text_features(train_image_reason, data_from=args.data_from)
+    print("---------------4.处理测试集中图像理由部分数据---------------")
+    test_image_feat, test_image_loss = extract_text_features(test_image_reason, data_from=args.data_from)
+    
+    # 2. 分别保存特征和损失（或根据需求选择保存）
+    np.save('reason_feature/train_text_reason_feature.npy', train_text_feat.numpy())
+    np.save('reason_feature/test_text_reason_feature.npy', test_text_feat.numpy())
+    np.save('reason_feature/train_image_reason_feature.npy', train_image_feat.numpy())
+    np.save('reason_feature/test_image_reason_feature.npy', test_image_feat.numpy())
 
     print("四个列表已保存为 .npy 文件")
     # print(len(train_text_reason))

@@ -351,9 +351,9 @@ class ImageRepairTool:
 def main():
     # 设置命令行参数
     parser = argparse.ArgumentParser(description='图像修复工具')
-    parser.add_argument('--input', type=str, default = "pre_data\image-verification-corpus\devset\images",
+    parser.add_argument('--input', type=str, default = "pre_data\\image-verification-corpus\\devset\\images",
                         help='输入图像或目录路径')
-    parser.add_argument('--output', type=str, default="D:\学习资料\多模态大模型谣言检测\python\MRML-main\\repaired_images",
+    parser.add_argument('--output', type=str, default="D:\\学习资料\\多模态大模型谣言检测\\python\\MRML-main\\repaired_images",
                         help='输出目录路径 (默认: repaired_images)')
     parser.add_argument('--model', type=str, default="codeformer.onnx",
                         help='ONNX修复模型路径 (可选)')

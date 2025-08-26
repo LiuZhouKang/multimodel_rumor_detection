@@ -1,10 +1,13 @@
 ###记得根据自己的需要来修改这里面的参数！！！关注注意事项！！！
 
 # 处理整个目录 + 指定输出目录
-python image_repair.py --input image-verification-corpus\images --output repaired_images
+# python image_repair.py --input image-verification-corpus\images --output repaired_images
+# 上面这行在我的wsl中有问题，因为斜杠和反斜杠会导致不同的语义
+# python image_repair.py --input image-verification-corpus/images --output repaired_images 
+python image_repair.py --input MM17-WeiboRumorSet/nonrumor_images --output repaired_images_nonrumor_images 
 
 #进行数据集的处理
-python data_prepare.py --ratio 0.2 --data_from weibo #ratio用于处理的数据集占总数据集的比例(默认"0.2")，data_from表示数据集的来源(默认"weibo")
+python data_prepare.py --ratio 0.1 --data_from weibo #ratio用于处理的数据集占总数据集的比例(默认"0.2")，data_from表示数据集的来源(默认"weibo")
 
 ##注意事项：用于保存的文件夹以及数据集文件夹名称记得修改或确认是否存在
 

@@ -8,7 +8,11 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 import time
 from zhipuai import ZhipuAI
+import os
 
+if not os.path.exists('reason_content'):
+    os.makedirs('reason_content')
+    
 # 获取对应的待处理数据集
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_from', type=str, default='weibo', help='数据集来源 (默认: weibo)')

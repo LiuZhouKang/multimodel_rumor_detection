@@ -8,6 +8,10 @@ from torchvision import transforms
 from PIL import Image
 import os
 from data_prepare import *
+import gc
+# 确保保存目录存在
+if not os.path.exists('normal_feature'):
+    os.makedirs('normal_feature')
 
 # 获取对应的待处理数据集
 parser = argparse.ArgumentParser()
@@ -146,6 +150,7 @@ def extract_vgg_features(layer_index=5):
     # 批量处理函数
     def batch_process(image_paths, batch_size=16):
         features = []
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # 新增：获取设备
         for i in tqdm(range(0, len(image_paths), batch_size), desc="Processing images"):
             batch_paths = image_paths[i:i+batch_size]
             
@@ -159,8 +164,12 @@ def extract_vgg_features(layer_index=5):
             batch_tensor = torch.stack(batch_images).to(device)
             with torch.no_grad():
                 batch_features = feature_extractor(batch_tensor)
+                # 转换为numpy并移到CPU后，立即删除GPU张量
                 features.extend([f.cpu().numpy() for f in batch_features])
-                      
+                del batch_tensor, batch_features  # 新增：删除不再需要的变量
+                if device.type == 'cuda':
+                    torch.cuda.empty_cache()  # 新增：释放GPU显存
+            gc.collect()  # 新增：强制回收CPU内存
         return np.array(features)
 
     # 创建矩阵规模转换模型
