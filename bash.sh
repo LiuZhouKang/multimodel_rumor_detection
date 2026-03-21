@@ -4,7 +4,17 @@
 # python image_repair.py --input image-verification-corpus\images --output repaired_images
 # 上面这行在我的wsl中有问题，因为斜杠和反斜杠会导致不同的语义
 # python image_repair.py --input image-verification-corpus/images --output repaired_images 
-python image_repair.py --input MM17-WeiboRumorSet/nonrumor_images --output repaired_images_nonrumor_images 
+
+
+
+# 黑块图片生成
+# python black_rect.py --input image-verification-corpus/images --output 黑块图片生成/image-verification-corpus/images
+# python black_rect.py --input MM17-WeiboRumorSet/nonrumor_images --output 黑块图片生成/MM17-WeiboRumorSet/nonrumor_images
+# python black_rect.py --input MM17-WeiboRumorSet/rumor_images --output 黑块图片生成/MM17-WeiboRumorSet/rumor_images
+# 图片修复
+# python image_repair.py --input MM17-WeiboRumorSet/rumor_images --output 黑块图片修复/MM17-WeiboRumorSet/rumor_images
+
+# 我本地使用的环境：E:\Anaconda3\envs\rumor\python.exe，所以可写命令为：E:\Anaconda3\envs\rumor\python.exe -u "d:\文件-分盘\工作相关\大创\拉取\multimodel_rumor_detection\clip_feature_process.py"
 
 #进行数据集的处理
 python data_prepare.py --ratio 0.1 --data_from weibo #ratio用于处理的数据集占总数据集的比例(默认"0.2")，data_from表示数据集的来源(默认"weibo")
