@@ -1,11 +1,32 @@
 import os
 import argparse
+import random
 import numpy as np
 import pandas as pd
 import re
 from sklearn.model_selection import train_test_split
 
-def get_weibo_datasets(ratio=0.2):
+def shuffle_data_pairs(text_list, image_path_list, labels, shuffle_ratio):
+    if shuffle_ratio <= 0.0:
+        return text_list, image_path_list, labels
+    
+    total = len(text_list)
+    shuffle_count = int(total * shuffle_ratio)
+    if shuffle_count < 2:
+        return text_list, image_path_list, labels
+
+    # 获取要打乱的索引
+    indices_to_shuffle = random.sample(range(total), shuffle_count)
+    shuffled_images = [image_path_list[i] for i in indices_to_shuffle]
+    # 打乱图片列表
+    random.shuffle(shuffled_images)
+    
+    for idx, new_img in zip(indices_to_shuffle, shuffled_images):
+        image_path_list[idx] = new_img
+        
+    return text_list, image_path_list, labels
+
+def get_weibo_datasets(ratio=0.2, shuffle_ratio=0.0):
     '''获取微博的数据集'''
     '''返回值为图像文件名列表和对应的文本列表和标签'''
 
@@ -79,9 +100,9 @@ def get_weibo_datasets(ratio=0.2):
 
     # print(len(train_image_path))
     # print(len(train_text))
-    # print(len(test_image_path))
-    # print(len(test_text))
-    # print(train_label)
+    # 打乱部分匹配
+    train_text, train_image_path, train_label = shuffle_data_pairs(train_text, train_image_path, train_label, shuffle_ratio)
+    test_text, test_image_path, test_label = shuffle_data_pairs(test_text, test_image_path, test_label, shuffle_ratio)
 
     #保存得到的数据集
     print("------------------数据处理完毕，得到数据集----------------")
@@ -216,7 +237,7 @@ def save_datasets(train_image_path, train_text, train_label, test_image_path, te
     # print(f"训练集: {len(train_image_path)} 样本 (非谣言: {train_label.count([1, 0])}, 谣言: {train_label.count([0, 1])})")
     # print(f"测试集: {len(test_image_path)} 样本 (非谣言: {test_label.count([1, 0])}, 谣言: {test_label.count([0, 1])})")
 
-def get_twitter_datasets(ratio=0.2):
+def get_twitter_datasets(ratio=0.2, shuffle_ratio=0.0):
     
     # 构建数据文件和图片目录的相对路径
     data_path = "image-verification-corpus/posts.txt"
@@ -234,6 +255,10 @@ def get_twitter_datasets(ratio=0.2):
     # 分割数据为训练集和测试集
     train_image_path, train_text, train_label, test_image_path, test_text, test_label = split_data(
         post_text_list, image_path_list, result['labels'], ratio)
+
+    # 打乱部分匹配
+    train_text, train_image_path, train_label = shuffle_data_pairs(train_text, train_image_path, train_label, shuffle_ratio)
+    test_text, test_image_path, test_label = shuffle_data_pairs(test_text, test_image_path, test_label, shuffle_ratio)
 
     # 保存数据集
     save_datasets(train_image_path, train_text, train_label, test_image_path, test_text, test_label)
@@ -275,9 +300,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--ratio', type=float, default=0.2, help='数据集采样比例 (默认: 0.2)')
     parser.add_argument('--data_from', type=str, default='weibo', help='数据集来源 (默认: weibo)')
+    parser.add_argument('--shuffle_ratio', type=float, default=0.0, help='部分打乱匹配比例 (默认: 0.0, 全匹配)')
     args = parser.parse_args()
 
     if args.data_from=='weibo':
-        get_weibo_datasets(args.ratio)
+        get_weibo_datasets(args.ratio, args.shuffle_ratio)
     elif args.data_from=='Twitter':
-        get_twitter_datasets(args.ratio)
+        get_twitter_datasets(args.ratio, args.shuffle_ratio)

@@ -8,10 +8,6 @@ from torchvision import transforms
 from PIL import Image
 import os
 from data_prepare import *
-import gc
-# 确保保存目录存在
-if not os.path.exists('normal_feature'):
-    os.makedirs('normal_feature')
 
 # 获取对应的待处理数据集
 parser = argparse.ArgumentParser()
@@ -110,11 +106,8 @@ def extract_bert_features(model_name='corpus/chinese_L-12_H-768_A-12', max_lengt
     # 创建模型
     model = Text_Bert_Feature_Extractor()
     # 前向传播，得到最后结果
-    train_text_feature = np.asarray(train_text_feature, dtype=np.float32).squeeze(1)
-    test_text_feature = np.asarray(test_text_feature, dtype=np.float32).squeeze(1)
-    with torch.no_grad():
-        train_text_feature = model(torch.from_numpy(train_text_feature))
-        test_text_feature = model(torch.from_numpy(test_text_feature))
+    train_text_feature = model(torch.tensor(train_text_feature))
+    test_text_feature = model(torch.tensor(test_text_feature))
 
     # 保存为numpy矩阵
     print("--------------3.处理完毕，正在保存处理后特征--------------")
@@ -153,7 +146,6 @@ def extract_vgg_features(layer_index=5):
     # 批量处理函数
     def batch_process(image_paths, batch_size=16):
         features = []
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # 新增：获取设备
         for i in tqdm(range(0, len(image_paths), batch_size), desc="Processing images"):
             batch_paths = image_paths[i:i+batch_size]
             
@@ -167,12 +159,8 @@ def extract_vgg_features(layer_index=5):
             batch_tensor = torch.stack(batch_images).to(device)
             with torch.no_grad():
                 batch_features = feature_extractor(batch_tensor)
-                # 转换为numpy并移到CPU后，立即删除GPU张量
                 features.extend([f.cpu().numpy() for f in batch_features])
-                del batch_tensor, batch_features  # 新增：删除不再需要的变量
-                if device.type == 'cuda':
-                    torch.cuda.empty_cache()  # 新增：释放GPU显存
-            gc.collect()  # 新增：强制回收CPU内存
+                      
         return np.array(features)
 
     # 创建矩阵规模转换模型
@@ -187,22 +175,15 @@ def extract_vgg_features(layer_index=5):
     
     # 保存为numpy矩阵
     print("--------------3.处理完毕，正在保存处理后特征--------------")
-    def project_feature_in_chunks(feature_array, chunk_size=16):
-        feature_array = np.asarray(feature_array, dtype=np.float32)
-        projected = []
-        with torch.no_grad():
-            for i in range(0, len(feature_array), chunk_size):
-                chunk = torch.from_numpy(feature_array[i:i + chunk_size])
-                out = model(chunk)
-                projected.append(out.numpy())
-                del chunk, out
-                gc.collect()
-        return np.concatenate(projected, axis=0)
-
-    train_image_feature = project_feature_in_chunks(train_image_feature, chunk_size=16)
+    # 前向传播，得到最后结果
+    train_image_feature = model(torch.tensor(train_image_feature))
+    train_image_feature = train_image_feature.detach().numpy()
+    # print(train_image_feature.shape)
     np.save("normal_feature/train_image_VGG_feature.npy", train_image_feature)
-
-    test_image_feature = project_feature_in_chunks(test_image_feature, chunk_size=16)
+    # 前向传播，得到最后结果
+    test_image_feature = model(torch.tensor(test_image_feature))
+    test_image_feature = test_image_feature.detach().numpy()
+    # print(test_image_feature.shape)
     np.save("normal_feature/test_image_VGG_feature.npy", test_image_feature)
 
 if __name__ == "__main__":

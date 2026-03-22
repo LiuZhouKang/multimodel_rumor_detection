@@ -5,7 +5,6 @@ from cn_clip.clip import load_from_name, tokenize
 import argparse
 from tqdm import tqdm
 import numpy as np
-import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_from', type=str, default='weibo', help='数据集来源 (默认: weibo)')
@@ -15,9 +14,6 @@ train_text_reason = np.load("reason_content/train_text_reason.npy")
 train_image_reason = np.load("reason_content/train_image_reason.npy")
 test_text_reason = np.load("reason_content/test_text_reason.npy")
 test_image_reason = np.load("reason_content/test_image_reason.npy")
-
-if not os.path.exists("reason_feature"):
-    os.makedirs("reason_feature")
 
 def extract_text_features(texts: List[str], data_from: str, batch_size: int = 64) -> tuple[torch.Tensor, np.ndarray]:
     """
@@ -65,7 +61,7 @@ def extract_text_features(texts: List[str], data_from: str, batch_size: int = 64
             # 计算损失
             loss = criterion(logits_per_text, labels)
             # 为每个样本分配相同的损失值（在实际应用中，也可以根据需求调整）
-            batch_losses = [loss.item()] * len(batch_texts)
+            batch_losses = [loss.item()]
             all_losses.extend(batch_losses)
 
     # 合并所有批次的特征
@@ -86,28 +82,21 @@ if __name__ == "__main__":
     print("---------------4.处理测试集中图像理由部分数据---------------")
     test_image_reason_feature, test_image_reason_loss = extract_text_features(test_image_reason, data_from=args.data_from)
     # print(test_image_reason_feature.shape)
-
-    if train_text_reason_feature.shape[0] != len(train_text_reason):
-        raise ValueError("训练集文本理由特征数量与原始样本数量不一致")
-    if test_text_reason_feature.shape[0] != len(test_text_reason):
-        raise ValueError("测试集文本理由特征数量与原始样本数量不一致")
-    if train_image_reason_feature.shape[0] != len(train_image_reason):
-        raise ValueError("训练集图像理由特征数量与原始样本数量不一致")
-    if test_image_reason_feature.shape[0] != len(test_image_reason):
-        raise ValueError("测试集图像理由特征数量与原始样本数量不一致")
     
 
     # 保存四个列表为 .npy 文件
-    np.save('reason_feature/train_text_reason_feature.npy', train_text_reason_feature.numpy().astype(np.float32))
-    np.save('reason_feature/test_text_reason_feature.npy', test_text_reason_feature.numpy().astype(np.float32))
-    np.save('reason_feature/train_image_reason_feature.npy', train_image_reason_feature.numpy().astype(np.float32))
-    np.save('reason_feature/test_image_reason_feature.npy', test_image_reason_feature.numpy().astype(np.float32))
-    np.save('reason_feature/train_text_reason_loss.npy', train_text_reason_loss.astype(np.float32))
-    np.save('reason_feature/test_text_reason_loss.npy', test_text_reason_loss.astype(np.float32))
-    np.save('reason_feature/train_image_reason_loss.npy', train_image_reason_loss.astype(np.float32))
-    np.save('reason_feature/test_image_reason_loss.npy', test_image_reason_loss.astype(np.float32))
+    np.save('reason_feature/train_text_reason_feature.npy', np.array(train_text_reason_feature))
+    np.save('reason_feature/test_text_reason_feature.npy', np.array(test_text_reason_feature))
+    np.save('reason_feature/train_image_reason_feature.npy', np.array(train_image_reason_feature))
+    np.save('reason_feature/test_image_reason_feature.npy', np.array(test_image_reason_feature))
 
-    print("四个列表已保存为 .npy 文件")
+    # 同时保存对应的loss
+    np.save('reason_feature/train_text_reason_loss.npy', np.array(train_text_reason_loss))
+    np.save('reason_feature/test_text_reason_loss.npy', np.array(test_text_reason_loss))
+    np.save('reason_feature/train_image_reason_loss.npy', np.array(train_image_reason_loss))
+    np.save('reason_feature/test_image_reason_loss.npy', np.array(test_image_reason_loss))
+
+    print("特征与损失已保存为 .npy 文件")
     # print(len(train_text_reason))
     # print(len(test_text_reason))
     # print(len(train_image_reason))

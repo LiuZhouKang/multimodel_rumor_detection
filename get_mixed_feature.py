@@ -5,6 +5,7 @@ import argparse
 # 获取对应的待处理数据集
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_from', type=str, default='weibo', help='数据集来源 (默认: weibo)')
+parser.add_argument('--disable_match', action='store_true', help='是否不带全文匹配检测')
 args = parser.parse_args()
 
 train_clip_text=np.load("clip_feature/train_text_clip_feature.npy")
@@ -41,12 +42,14 @@ def cosine_similarity(A, B):
     return abs(dot_product / (norm_A * norm_B))
 
 # 计算simulation_score
-def calculate_simulation_score(vgg_image,bert_text,clip_image,clip_text):
+def calculate_simulation_score(vgg_image,bert_text,clip_image,clip_text, disable_match=False):
+    if disable_match:
+        return 0.5
     # 计算simulation_score
     simulation_score=(cosine_similarity(vgg_image,bert_text)+cosine_similarity(clip_image,bert_text)+cosine_similarity(clip_text,vgg_image))/3
     return simulation_score
 
-def get_mixed_feature():
+def get_mixed_feature(disable_match=False):
     
     train_mixed_feature_list=[]
     test_mixed_feature_list=[]
@@ -55,7 +58,7 @@ def get_mixed_feature():
     print("\n------------------1.正在处理训练集中融合后的特征矩阵----------------")
     for i in range(len(train_label)):
         # 计算simulation_score
-        simulation_score=calculate_simulation_score(train_vgg_image[i],train_bert_text[i],train_clip_image[i],train_clip_text[i])
+        simulation_score=calculate_simulation_score(train_vgg_image[i],train_bert_text[i],train_clip_image[i],train_clip_text[i], disable_match)
         # 拼接文本和语义表征
         mixed_1=np.concatenate((train_bert_text[i],train_vgg_image[i]),axis=0)
         # 拼接文本与语义可信表征
@@ -71,7 +74,7 @@ def get_mixed_feature():
     print("------------------3.正在处理测试集中融合后的特征矩阵----------------")
     for i in range(len(test_label)):
         # 计算simulation_score
-        simulation_score=calculate_simulation_score(test_vgg_image[i],test_bert_text[i],test_clip_image[i],test_clip_text[i])
+        simulation_score=calculate_simulation_score(test_vgg_image[i],test_bert_text[i],test_clip_image[i],test_clip_text[i], disable_match)
         # 拼接文本和语义表征
         mixed_1=np.concatenate((test_bert_text[i],test_vgg_image[i]),axis=0)
         # 拼接文本与语义可信表征
@@ -95,7 +98,7 @@ def get_mixed_feature():
     return train_mixed_feature_list,test_mixed_feature_list,match_loss_list
 
 if __name__ == '__main__':
-    train_mixed_feature_list,test_mixed_feature_list,match_loss_list=get_mixed_feature()
+    train_mixed_feature_list,test_mixed_feature_list,match_loss_list=get_mixed_feature(args.disable_match)
     train_mixed_feature=np.array(train_mixed_feature_list)
     test_mixed_feature=np.array(test_mixed_feature_list)
     match_loss=np.array(match_loss_list)
