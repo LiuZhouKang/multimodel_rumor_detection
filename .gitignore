@@ -1,0 +1,34 @@
+# 数据库和数据集相关文件夹
+reason_content/
+reason_feature/
+repaired_images/
+repaired_images_nonrumor_images/
+weibo_datasets/
+normal_feature/
+main_datasets/
+image-verification-corpus/
+corpus/
+clip_feature/
+MM17-WeiboRumorSet/
+普通图片修复/
+模糊图片/
+初始图片文字/
+黑块图片生成/
+黑块图片修复/
+初始图片修复/
+# 虚拟环境
+myenv-3.9/
+
+# 开发工具相关
+.vscode/
+
+# Python 编译文件
+__pycache__/
+
+# 特定文件
+主要代码结构.txt
+codeformer.onnx
+repair_log.txt
+*.md
+*.png
+*.npy

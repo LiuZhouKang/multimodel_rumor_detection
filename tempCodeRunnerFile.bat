@@ -1,0 +1,1 @@
+E:\Anaconda3\envs\rumor\python.exe -u judge_by_bigmodal.py --data_from weibo
