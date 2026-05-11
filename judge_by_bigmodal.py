@@ -7,7 +7,7 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 import time
-from zhipuai import ZhipuAI
+from zhipuai import ZhipuAI 
 
 # 获取对应的待处理数据集
 parser = argparse.ArgumentParser()

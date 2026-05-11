@@ -4,7 +4,7 @@ import numpy as np
 import argparse
 from tqdm import tqdm
 from PIL import Image
-import onnxruntime as ort
+import onnxruntime as ort 
 
 
 class ImageRepairTool:

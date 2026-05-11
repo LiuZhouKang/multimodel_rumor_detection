@@ -50,7 +50,7 @@ def calculate_cosine_similarity(vec1, vec2):
     norm2 = np.linalg.norm(vec2)
     if norm1 == 0 or norm2 == 0:
         return 0
-    return dot_product / (norm1 * norm2)
+    return dot_product / (norm1 * norm2) 
 
 def extract_text_features(text):
     """提取文本特征向量（简化的特征提取）"""

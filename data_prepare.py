@@ -114,7 +114,7 @@ def extract_fields(data_path):
     image_ids = df['image_id(s)'].tolist()
     usernames = df['username'].tolist()
     timestamps = df['timestamp'].tolist()
-    labels = df['label'].tolist()  # 原始标签为字符串（如 'fake'/'real'）
+    labels = df['label'].tolist()  # 原始标签为字符串（如 'fake'/'real'） 
 
     # 将标签字符串转换为列表格式（[1,0] 表示非谣言，[0,1] 表示谣言）
     converted_labels = []

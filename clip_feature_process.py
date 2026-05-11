@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
-from data_prepare import *
+from data_prepare import * 
 
 # 获取对应的待处理数据集
 parser = argparse.ArgumentParser()

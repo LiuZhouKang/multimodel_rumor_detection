@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-import torch.optim as optim
+import torch.optim as optim 
 
 class BinaryClassifier(nn.Module):
     def __init__(self, input_dim):

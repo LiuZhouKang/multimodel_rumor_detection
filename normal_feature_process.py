@@ -7,7 +7,7 @@ import torchvision.models as models
 from torchvision import transforms
 from PIL import Image
 import os
-from data_prepare import *
+from data_prepare import * 
 
 # 获取对应的待处理数据集
 parser = argparse.ArgumentParser()

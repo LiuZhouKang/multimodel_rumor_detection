@@ -17,7 +17,7 @@ test_image_reason = np.load("reason_content/test_image_reason.npy")
 
 def extract_text_features(texts: List[str], data_from: str, batch_size: int = 64) -> tuple[torch.Tensor, np.ndarray]:
     """
-    借助CLIP对输入的中文或英文文本进行处理，提取特征矩阵，并计算每个样本的损失
+    借助CLIP对输入的中文或英文文本进行处理，提取特征矩阵，并计算每个样本的损失 
 
     :param texts: 输入的文本列表
     :param data_from: 指定文本语言，'chinese' 或 'english'

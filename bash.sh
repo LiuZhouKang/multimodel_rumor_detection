@@ -9,7 +9,7 @@ python data_prepare.py --ratio 0.2 --data_from weibo #ratio用于处理的数据
 ##注意事项：用于保存的文件夹以及数据集文件夹名称记得修改或确认是否存在
 
 #获取CLIP的特征
-python clip_feature_process.py --data_from weibo #data_from表示数据集的来源(默认"weibo")
+python clip_feature_process.py --data_from weibo #data_from表示数据集的来源(默认"weibo") 
 
 ##注意事项：用于保存的文件夹名称记得修改或确认是否存在
 
