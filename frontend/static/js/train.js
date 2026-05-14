@@ -46,6 +46,15 @@ function initTrainingSocket() {
         }
     });
     
+    // 监听特征提取进度，特别关注reason阶段的完成
+    trainingSocket.on('training_progress', function(data) {
+        if (data.stage === 'reason' && data.status === 'completed') {
+            // 当reason阶段完成后，启用融合按钮
+            addLog('success', '推理特征提取完成！现在可以进行特征融合了。');
+            document.getElementById('btn-fusion').disabled = false;
+        }
+    });
+    
     trainingSocket.on('disconnect', function() {
         console.log('与服务器断开连接');
         addLog('warning', '与服务器断开连接');
@@ -208,17 +217,17 @@ async function handleExtractFeatures() {
         addLog('success', 'VGG特征提取完成');
         
         if (extractReason) {
-            updateStageStatus('reason', 'running', '提取中...');
+            updateStageStatus('reason', 'running', '推理中...');
             // 提取推理特征（异步执行，通过WebSocket推送进度）
             addLog('info', `正在调用${modelProvider === 'zhipu' ? '智谱GLM' : '通义千问'}大模型进行推理...`);
             await callFeatureAPI('/api/train/extract_reason', source, apiKey, modelProvider);
             addLog('info', '推理任务已启动，请等待日志输出...');
-            // 注意：由于是异步执行，这里不立即标记为完成，等待WebSocket推送
+            // 注意：由于是异步执行，这里不立即启用融合按钮，等待WebSocket推送reason完成消息
+        } else {
+            // 如果没有启用大模型推理，提取完VGG后就启用融合按钮
+            addLog('success', '基础特征提取完成！请点击"特征融合"按钮继续。');
+            document.getElementById('btn-fusion').disabled = false;
         }
-        
-        // 特征提取完成后，启用特征融合按钮
-        addLog('success', '基础特征提取完成！请点击"特征融合"按钮继续。');
-        document.getElementById('btn-fusion').disabled = false;
         
     } catch (error) {
         addLog('error', `特征提取失败: ${error.message}`);

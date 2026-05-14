@@ -1,6 +1,7 @@
 # 特征混合得到待处理的特征数据集
 import numpy as np
 import argparse 
+import os
 
 # 获取对应的待处理数据集
 parser = argparse.ArgumentParser()
@@ -26,6 +27,7 @@ if args.data_from=='weibo':
 elif args.data_from=='Twitter':
     train_label=np.load("~/multimodel_rumor_detection/Twitter_datasets/train_label.npy")
     test_label=np.load("~/multimodel_rumor_detection/Twitter_datasets/test_label.npy")
+os.makedirs("~/multimodel_rumor_detection/main_datasets", exist_ok=True)
 np.save("~/multimodel_rumor_detection/main_datasets/train_label.npy", train_label)
 np.save("~/multimodel_rumor_detection/main_datasets/test_label.npy", test_label)
 
@@ -101,6 +103,7 @@ if __name__ == '__main__':
     match_loss=np.array(match_loss_list)
 
     print("----------------------5.正在保存融合后的特征矩阵--------------------")
+    os.makedirs("~/multimodel_rumor_detection/main_datasets", exist_ok=True)
     np.save("~/multimodel_rumor_detection/main_datasets/train_mixed_feature.npy",train_mixed_feature)
     np.save("~/multimodel_rumor_detection/main_datasets/test_mixed_feature.npy",test_mixed_feature)
     print("----------------------6.融合后的特征矩阵保存完毕--------------------\n")
