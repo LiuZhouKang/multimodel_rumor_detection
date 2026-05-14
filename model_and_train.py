@@ -1,3 +1,4 @@
+import argparse
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -5,12 +6,12 @@ import numpy as np
 import torch.optim as optim 
 
 class BinaryClassifier(nn.Module):
-    def __init__(self, input_dim):
+    def __init__(self, input_dim, dropout=0.2):
         super(BinaryClassifier, self).__init__()
         self.fc1 = nn.Linear(input_dim, 256)
         self.fc2 = nn.Linear(256, 16)
         self.fc3 = nn.Linear(16, 2)
-        self.dropout = nn.Dropout(0.2)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
@@ -21,22 +22,29 @@ class BinaryClassifier(nn.Module):
         return x
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='训练多模态谣言检测模型')
+    parser.add_argument('--epochs', type=int, default=1000, help='训练轮数')
+    parser.add_argument('--lr', type=float, default=0.001, help='学习率')
+    parser.add_argument('--batch_size', type=int, default=32, help='批次大小')
+    parser.add_argument('--dropout', type=float, default=0.2, help='Dropout比率')
+    args = parser.parse_args()
+
     X_train=torch.FloatTensor(np.load("main_datasets/train_mixed_feature.npy"))
     Y_train=torch.FloatTensor(np.load("main_datasets/train_label.npy"))
     X_test=torch.FloatTensor(np.load("main_datasets/test_mixed_feature.npy"))
     Y_test=torch.FloatTensor(np.load("main_datasets/test_label.npy"))
 
     # 初始化模型
-    model = BinaryClassifier(input_dim=1024)
+    model = BinaryClassifier(input_dim=1024, dropout=args.dropout)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     # 训练循环
     best_accuracy = 0
     best_model_state = None
     best_epoch = 0
-    best_metrics = {'precision': 0, 'recall': 0, 'f1': 0}  # 新增：记录最佳指标
-    epochs = 100
+    best_metrics = {'precision': 0, 'recall': 0, 'f1': 0}
+    epochs = args.epochs
 
     for epoch in range(epochs):
         model.train()
@@ -82,6 +90,10 @@ if __name__ == "__main__":
     print(f'Precision: {best_metrics["precision"]:.4f}')
     print(f'Recall: {best_metrics["recall"]:.4f}')
     print(f'F1 Score: {best_metrics["f1"]:.4f}')
+    
+    # 保存最佳模型到文件
+    torch.save(best_model_state, 'best_model.pth')
+    print(f'\n模型已保存到: best_model.pth')
     
 
 

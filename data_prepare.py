@@ -1,11 +1,58 @@
 import os
+import sys
 import argparse
 import numpy as np
 import pandas as pd
 import re
 from sklearn.model_selection import train_test_split
+import subprocess
+import shutil
 
-def get_weibo_datasets(ratio=0.2):
+def enhance_dataset_images(image_paths, output_dir="enhanced_images", enhance_enabled=True):
+    """
+    使用image_repair.py增强数据集中的图像
+    """
+    if not enhance_enabled:
+        print("图像增强已禁用，跳过图像处理")
+        return image_paths
+    
+    print(f"开始处理 {len(image_paths)} 个图像...")
+    
+    # 创建输出目录
+    os.makedirs(output_dir, exist_ok=True)
+    
+    enhanced_paths = []
+    for img_path in image_paths:
+        if os.path.exists(img_path):
+            # 获取文件名
+            filename = os.path.basename(img_path)
+            enhanced_path = os.path.join(output_dir, filename)
+            
+            # 调用image_repair.py进行增强
+            try:
+                result = subprocess.run([
+                    sys.executable, 'image_repair.py',
+                    '--input', img_path,
+                    '--output', output_dir,
+                    '--mode', 'enhance'  # 使用增强模式
+                ], capture_output=True, text=True, timeout=300)
+                
+                # 检查增强后的文件是否存在
+                if os.path.exists(enhanced_path):
+                    enhanced_paths.append(enhanced_path)
+                else:
+                    # 如果增强失败，使用原图
+                    enhanced_paths.append(img_path)
+            except Exception as e:
+                print(f"图像增强失败 {img_path}: {str(e)}, 使用原图")
+                enhanced_paths.append(img_path)
+        else:
+            enhanced_paths.append(img_path)  # 如果原图不存在，保持原路径
+    
+    print(f"图像增强完成，共处理 {len(enhanced_paths)} 个图像")
+    return enhanced_paths
+
+def get_weibo_datasets(ratio=0.2, enhance_images=True):
     '''获取微博的数据集'''
     '''返回值为图像文件名列表和对应的文本列表和标签'''
 
@@ -82,6 +129,13 @@ def get_weibo_datasets(ratio=0.2):
     # print(len(test_image_path))
     # print(len(test_text))
     # print(train_label)
+
+    # 对图像进行增强处理
+    if enhance_images:
+        print("---------------开始图像增强处理---------------")
+        train_image_path = enhance_dataset_images(train_image_path, "enhanced_images/train", enhance_enabled=True)
+        test_image_path = enhance_dataset_images(test_image_path, "enhanced_images/test", enhance_enabled=True)
+        print("---------------图像增强处理完成---------------")
 
     #保存得到的数据集
     print("------------------数据处理完毕，得到数据集----------------")
@@ -216,7 +270,7 @@ def save_datasets(train_image_path, train_text, train_label, test_image_path, te
     # print(f"训练集: {len(train_image_path)} 样本 (非谣言: {train_label.count([1, 0])}, 谣言: {train_label.count([0, 1])})")
     # print(f"测试集: {len(test_image_path)} 样本 (非谣言: {test_label.count([1, 0])}, 谣言: {test_label.count([0, 1])})")
 
-def get_twitter_datasets(ratio=0.2):
+def get_twitter_datasets(ratio=0.2, enhance_images=True):
     
     # 构建数据文件和图片目录的相对路径
     data_path = "image-verification-corpus/posts.txt"
@@ -234,6 +288,13 @@ def get_twitter_datasets(ratio=0.2):
     # 分割数据为训练集和测试集
     train_image_path, train_text, train_label, test_image_path, test_text, test_label = split_data(
         post_text_list, image_path_list, result['labels'], ratio)
+
+    # 对图像进行增强处理
+    if enhance_images:
+        print("---------------开始图像增强处理---------------")
+        train_image_path = enhance_dataset_images(train_image_path, "enhanced_images/train", enhance_enabled=True)
+        test_image_path = enhance_dataset_images(test_image_path, "enhanced_images/test", enhance_enabled=True)
+        print("---------------图像增强处理完成---------------")
 
     # 保存数据集
     save_datasets(train_image_path, train_text, train_label, test_image_path, test_text, test_label)
@@ -275,9 +336,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--ratio', type=float, default=0.2, help='数据集采样比例 (默认: 0.2)')
     parser.add_argument('--data_from', type=str, default='weibo', help='数据集来源 (默认: weibo)')
+    parser.add_argument('--enhance_images', action='store_true', help='启用图像增强功能')
+    parser.add_argument('--no_enhance_images', action='store_false', dest='enhance_images', help='禁用图像增强功能')
+    parser.set_defaults(enhance_images=True)  # 默认启用图像增强
     args = parser.parse_args()
 
     if args.data_from=='weibo':
-        get_weibo_datasets(args.ratio)
+        get_weibo_datasets(args.ratio, enhance_images=args.enhance_images)
     elif args.data_from=='Twitter':
-        get_twitter_datasets(args.ratio)
+        get_twitter_datasets(args.ratio, enhance_images=args.enhance_images)

@@ -1,5 +1,5 @@
 import os
-import cv2
+import cv
 import numpy as np
 import argparse
 from tqdm import tqdm

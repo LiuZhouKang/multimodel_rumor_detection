@@ -1,0 +1,553 @@
+/* ==================== 训练页面专属样式 ==================== */
+
+/* 覆盖style.css中的.section display:none规则 */
+.section {
+    display: block !important;
+}
+
+#train-progress {
+    display: block;
+}
+
+.header-subtitle {
+    background: var(--primary-color);
+    color: #fff;
+    padding: 0.3rem 0.9rem;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    margin-left: 1.2rem;
+}
+
+/* ==================== 配置网格 ==================== */
+
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+    .config-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .config-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==================== 配置面板 ==================== */
+
+.config-panel {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    min-height: 400px;
+}
+
+.panel-header {
+    background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+    color: #fff;
+    padding: 1.5rem 2rem;
+}
+
+.panel-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.panel-header i {
+    margin-right: 0.75rem;
+}
+
+.panel-body {
+    padding: 2rem;
+}
+
+/* ==================== 表单控件 ==================== */
+
+.select-input {
+    width: 100%;
+    padding: 0.9rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 1.1rem;
+    background: var(--bg-primary);
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.select-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.number-input {
+    width: 100%;
+    padding: 0.9rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 1.1rem;
+    transition: border-color 0.2s;
+}
+
+.number-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.number-input-small {
+    width: 100px;
+    padding: 0.6rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 1.1rem;
+    text-align: center;
+    transition: border-color 0.2s;
+}
+
+.number-input-small:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.ratio-input-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.range-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.range-input {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+}
+
+.range-input::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    border: none;
+}
+
+.range-value {
+    min-width: 100px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--primary-color);
+    background: var(--bg-secondary);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-md);
+    font-size: 1.1rem;
+}
+
+.help-text {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-top: 0.75rem;
+}
+
+/* ==================== 复选框组 ==================== */
+
+.checkbox-group {
+    margin-bottom: 2rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkbox-desc {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.2rem;
+    padding-left: 2rem;
+}
+
+/* ==================== 按钮 ==================== */
+
+.btn-full {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 1.1rem 2.5rem;
+    font-size: 1.1rem;
+}
+
+.btn-info {
+    background: #06b6d4;
+    color: #fff;
+}
+
+.btn-info:hover:not(:disabled) {
+    background: #0891b2;
+}
+
+.btn-warning {
+    background: var(--warning-color);
+    color: #fff;
+}
+
+.btn-warning:hover:not(:disabled) {
+    background: #d97706;
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #dc2626;
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: #fff;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: #059669;
+}
+
+/* ==================== 进度卡片 ==================== */
+
+.progress-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.progress-header h3 {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+}
+
+.task-status {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+/* ==================== 训练阶段 ==================== */
+
+.progress-stages {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stage-item {
+    display: grid;
+    grid-template-columns: 60px 1fr 120px;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    transition: all 0.3s;
+}
+
+.stage-item.active {
+    background: #eff6ff;
+    border: 2px solid var(--primary-color);
+}
+
+.stage-item.completed {
+    background: #f0fdf4;
+    border: 2px solid var(--success-color);
+}
+
+.stage-item.error {
+    background: #fef2f2;
+    border: 2px solid var(--danger-color);
+}
+
+.stage-icon {
+    font-size: 2.5rem;
+    text-align: center;
+}
+
+.stage-info {
+    padding: 0 1.5rem;
+}
+
+.stage-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.stage-desc {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.stage-status {
+    text-align: center;
+    padding: 0.7rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.stage-status.pending {
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+}
+
+.stage-status.running {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.stage-status.completed {
+    background: var(--success-color);
+    color: #fff;
+}
+
+.stage-status.error {
+    background: var(--danger-color);
+    color: #fff;
+}
+
+/* ==================== 训练日志 ==================== */
+
+.training-logs {
+    margin-top: 3rem;
+}
+
+.training-logs h4 {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
+.log-container {
+    background: var(--bg-dark);
+    color: #e5e7eb;
+    padding: 2rem;
+    border-radius: var(--radius-md);
+    height: 400px;
+    overflow-y: auto;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 1rem;
+}
+
+.log-entry {
+    margin-bottom: 0.75rem;
+    line-height: 1.8;
+}
+
+.log-entry.info {
+    color: #60a5fa;
+}
+
+.log-entry.success {
+    color: #10b981;
+}
+
+.log-entry.warning {
+    color: #f59e0b;
+}
+
+.log-entry.error {
+    color: #ef4444;
+}
+
+/* ==================== 监控网格 ==================== */
+
+.monitor-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    max-width: 1600px;
+    margin: 0 auto 3rem;
+}
+
+@media (max-width: 1024px) {
+    .monitor-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.monitor-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.card-header h3 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+.card-badge {
+    background: var(--primary-color);
+    color: #fff;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* ==================== 图表 ==================== */
+
+canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* ==================== 评估指标 ==================== */
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.metric-item {
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.metric-label {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* ==================== 统计列表 ==================== */
+
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+}
+
+.stat-name {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.stat-data {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+/* ==================== 训练操作按钮 ==================== */
+
+.train-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* ==================== 滚动条样式 ==================== */
+
+.log-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.log-container::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 6px;
+}
+
+.log-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 6px;
+}
+
+.log-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}

@@ -190,22 +190,127 @@ python model_and_train.py
 3. 根据硬件资源调整批处理大小和线程数
 4. 大模型推理可能产生费用，请注意控制使用量
 
+## 部署Web服务
+
+本项目包含完整的Web前后端系统，提供可视化的谣言检测界面和RESTful API接口。
+
+### 启动Web服务
+
+```bash
+# 启动Flask Web服务（默认端口5000）
+python app.py
+```
+
+启动后访问 http://localhost:5000 即可使用Web界面。
+
+### Web功能
+
+- **可视化界面**：支持文本输入和图像上传，实时显示检测结果
+- **进度展示**：WebSocket实时推送特征提取和推理进度
+- **结果可视化**：概率分布图表、特征信息展示、推理说明
+- **API接口**：提供完整的RESTful API供第三方调用
+
+### API接口说明
+
+1. **健康检查**: `GET /api/health`
+2. **单条预测**: `POST /api/predict` (JSON格式)
+3. **文件上传预测**: `POST /api/predict/upload` (Form格式)
+4. **批量预测**: `POST /api/batch_predict` (最多10条)
+
+### 系统架构
+
+```
+┌─────────────┐     ┌──────────────┐     ┌──────────────┐
+│   前端界面   │◄───►│ Flask后端服务 │◄───►│  深度学习模型  │
+│ HTML/CSS/JS │     │ Flask+Socket │     │ BERT/VGG/CLIP│
+└─────────────┘     └──────────────┘     └──────────────┘
+                           │
+                     ┌──────────────┐
+                     │  Web界面功能  │
+                     │ - 文本输入    │
+                     │ - 图像上传    │
+                     │ - 进度展示    │
+                     │ - 结果可视化  │
+                     └──────────────┘
+```
+
 ## 文件结构
 
 ```
 multimodel_rumor_detection/
-├── data_prepare.py          # 数据预处理
-├── judge_by_bigmodal.py     # 大模型推理
-├── model_and_train.py       # 模型训练
-├── clip_feature_process.py  # CLIP特征提取
-├── normal_feature_process.py # VGG/BERT特征提取
-├── reason_feature_process.py # 推理特征处理
-├── get_mixed_feature.py     # 特征融合
-├── image_repair.py          # 图像修复
-├── bash.sh                  # 执行脚本
-├── requirement.txt          # 依赖包
-└── README.md               # 项目说明
+├── app.py                     # Flask Web服务主程序
+├── data_prepare.py            # 数据预处理
+├── judge_by_bigmodal.py       # 大模型推理
+├── model_and_train.py         # 模型训练
+├── clip_feature_process.py    # CLIP特征提取
+├── bert_feature_process.py    # BERT文本特征提取
+├── vgg_feature_process.py     # VGG图像特征提取
+── normal_feature_process.py  # 原始BERT/VGG联合提取(保留)
+├── reason_feature_process.py  # 推理特征处理
+├── get_mixed_feature.py       # 特征融合
+├── image_repair.py            # 图像修复
+├── bash.sh                    # 执行脚本
+├── requirement.txt            # 依赖包
+├── README.md                  # 项目说明
+├── 部署指南.md                # Web服务部署文档
+├── frontend/                  # Web前端文件
+│   ├── templates/
+│   │   ├── index.html        # 主页模板
+│   │   └── train.html        # 训练页面模板
+│   └── static/
+│       ├── css/
+│       │   ├── style.css     # 主页样式
+│       │   └── train.css     # 训练页面样式
+│       └── js/
+│           ├── main.js       # 主页逻辑
+│           └── train.js      # 训练页面逻辑
+── uploads/                   # 上传文件临时目录
 ```
+
+## 运行流程
+
+完整的运行流程如下（参考 `bash.sh`）：
+
+```bash
+# 1. 图像修复（可选）
+python image_repair.py --input image-verification-corpus/images --output repaired_images
+
+# 2. 数据集预处理
+python data_prepare.py --ratio 0.2 --data_from weibo
+
+# 3. 提取CLIP特征
+python clip_feature_process.py --data_from weibo
+
+# 4. 提取BERT文本特征
+python bert_feature_process.py --data_from weibo
+
+# 5. 提取VGG图像特征
+python vgg_feature_process.py --data_from weibo
+
+# 6. 调用大模型API进行推理分析
+python judge_by_bigmodal.py --data_from weibo
+
+# 7. 处理推理结果获取特征
+python reason_feature_process.py --data_from weibo
+
+# 8. 特征融合
+python get_mixed_feature.py --data_from weibo
+
+# 9. 模型训练与测试
+python model_and_train.py
+```
+
+### Web界面训练流程
+
+通过Web界面可以可视化地完成整个训练流程：
+
+1. 启动Web服务：`python app.py`
+2. 访问训练页面：http://localhost:5000/train
+3. 按步骤操作：
+   - **数据准备**：选择数据集来源和采样比例
+   - **特征提取**：依次提取CLIP、BERT、VGG特征
+   - **模型训练**：设置训练参数并启动训练
+   - **训练监控**：实时查看损失曲线和准确率
 
 ## 贡献
 

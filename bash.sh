@@ -1,10 +1,10 @@
 ###记得根据自己的需要来修改这里面的参数！！！关注注意事项！！！
 
-# 处理整个目录 + 指定输出目录
-python image_repair.py --input image-verification-corpus\images --output repaired_images
+# 处理整个目录 + 指定输出目录（可选，如果想预先处理所有图像）
+# python image_repair.py --input image-verification-corpus/images --output repaired_images
 
 #进行数据集的处理
-python data_prepare.py --ratio 0.2 --data_from weibo #ratio用于处理的数据集占总数据集的比例(默认"0.2")，data_from表示数据集的来源(默认"weibo")
+python data_prepare.py --ratio 0.2 --data_from weibo --enhance_images #ratio用于处理的数据集占总数据集的比例(默认"0.2")，data_from表示数据集的来源(默认"weibo")，--enhance_images启用图像增强
 
 ##注意事项：用于保存的文件夹以及数据集文件夹名称记得修改或确认是否存在
 
@@ -13,8 +13,13 @@ python clip_feature_process.py --data_from weibo #data_from表示数据集的来
 
 ##注意事项：用于保存的文件夹名称记得修改或确认是否存在
 
-#获取VGG与BERT的特征
-python normal_feature_process.py --data_from weibo #data_from表示数据集的来源(默认"weibo")
+#获取BERT的特征
+python bert_feature_process.py --data_from weibo #data_from表示数据集的来源(默认"weibo")
+
+##注意事项：用于保存的文件夹名称记得修改或确认是否存在
+
+#获取VGG的特征
+python vgg_feature_process.py --data_from weibo #data_from表示数据集的来源(默认"weibo")
 
 ##注意事项：用于保存的文件夹名称记得修改或确认是否存在
 

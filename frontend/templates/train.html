@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模型训练 - 多模态谣言检测系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/train.css') }}">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-left">
+                <h1 class="logo">多模态谣言检测系统</h1>
+                <span class="header-subtitle">训练控制台</span>
+            </div>
+            <nav class="header-nav">
+                <a href="{{ url_for('index') }}" class="nav-link">检测分析</a>
+                <a href="{{ url_for('train_page') }}" class="nav-link active">模型训练</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="main-content">
+        <div class="container">
+            <!-- 训练配置模块 -->
+            <section id="train-config" class="section active-section">
+                <div class="section-title">
+                    <h2>模型训练配置</h2>
+                    <p>配置训练参数并启动模型训练流程</p>
+                </div>
+
+                <div class="config-grid">
+                    <!-- 左侧：数据集配置 -->
+                    <div class="config-panel">
+                        <div class="panel-header">
+                            <h3><i class="icon-dataset"></i>数据集配置</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label for="dataset-source">
+                                    数据集来源
+                                </label>
+                                <select id="dataset-source" class="select-input">
+                                    <option value="weibo">微博数据集 (中文)</option>
+                                    <option value="Twitter">Twitter数据集 (英文)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="data-ratio">
+                                    采样比例
+                                </label>
+                                <div class="ratio-input-group">
+                                    <input 
+                                        type="range" 
+                                        id="data-ratio" 
+                                        class="range-input" 
+                                        min="0.1" 
+                                        max="1.0" 
+                                        step="0.1" 
+                                        value="0.2"
+                                    >
+                                    <input 
+                                        type="number" 
+                                        id="data-ratio-number" 
+                                        class="number-input-small" 
+                                        min="0.1" 
+                                        max="1.0" 
+                                        step="0.1" 
+                                        value="0.2"
+                                    >
+                                </div>
+                                <p class="help-text">选择用于训练的数据占总数据的比例（0.1-1.0）</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="data-split">
+                                    训练集/测试集比例
+                                </label>
+                                <div class="range-group">
+                                    <input 
+                                        type="range" 
+                                        id="data-split" 
+                                        class="range-input" 
+                                        min="0.5" 
+                                        max="0.9" 
+                                        step="0.05" 
+                                        value="0.7"
+                                    >
+                                    <span id="data-split-value" class="range-value">70%/30%</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="enable-image-enhance" checked>
+                                    <span>启用图像增强</span>
+                                </label>
+                                <p class="help-text">在数据准备阶段对图像进行质量增强，提升模型鲁棒性</p>
+                            </div>
+
+                            <button class="btn btn-secondary btn-full" id="btn-prepare-data">
+                                <span class="btn-text">准备数据集</span>
+                                <span class="btn-loading" style="display:none">
+                                    <span class="spinner"></span>
+                                    处理中...
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 中间：特征提取配置 -->
+                    <div class="config-panel">
+                        <div class="panel-header">
+                            <h3><i class="icon-feature"></i>特征提取</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="extract-clip" checked disabled>
+                                    <span>CLIP特征提取 (必选)</span>
+                                </label>
+                                <p class="checkbox-desc">使用ViT-B/32模型提取跨模态特征</p>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="extract-bert" checked disabled>
+                                    <span>BERT特征提取 (必选)</span>
+                                </label>
+                                <p class="checkbox-desc">提取文本深层语义特征</p>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="extract-vgg" checked disabled>
+                                    <span>VGG特征提取 (必选)</span>
+                                </label>
+                                <p class="checkbox-desc">提取图像视觉特征</p>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="extract-reason">
+                                    <span>大模型推理特征提取 (可选)</span>
+                                </label>
+                                <p class="checkbox-desc">使用大模型生成推理依据</p>
+
+                                <!-- 大模型提供商选择 -->
+                                <div class="form-group" id="model-provider-group" style="display:none; margin-top: 1rem;">
+                                    <label for="model-provider">
+                                        大模型提供商
+                                    </label>
+                                    <select id="model-provider" class="select-input">
+                                        <option value="zhipu">智谱AI (GLM)</option>
+                                        <option value="qwen">通义千问 (Qwen)</option>
+                                    </select>
+                                    <p class="help-text" id="model-desc">使用GLM-4系列大模型</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="api-key-group" style="display:none">
+                                <label for="api-key">
+                                    <span id="api-key-label">智谱AI API密钥</span>
+                                </label>
+                                <input 
+                                    type="password" 
+                                    id="api-key" 
+                                    class="text-input" 
+                                    placeholder="输入您的API Key..."
+                                    style="min-height:auto;padding:0.75rem"
+                                >
+                                <p class="help-text" id="api-key-desc">用于调用GLM-4系列大模型</p>
+                            </div>
+
+                            <button class="btn btn-secondary btn-full" id="btn-extract-features">
+                                <span class="btn-text">提取特征</span>
+                                <span class="btn-loading" style="display:none">
+                                    <span class="spinner"></span>
+                                    提取中...
+                                </span>
+                            </button>
+
+                            <button class="btn btn-info btn-full" id="btn-fusion" disabled>
+                                <span class="btn-text">特征融合</span>
+                                <span class="btn-loading" style="display:none">
+                                    <span class="spinner"></span>
+                                    融合中...
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：模型训练配置 -->
+                    <div class="config-panel">
+                        <div class="panel-header">
+                            <h3><i class="icon-train"></i>训练参数</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label for="epochs">
+                                    训练轮数 (Epochs)
+                                </label>
+                                <input 
+                                    type="number" 
+                                    id="epochs" 
+                                    class="number-input" 
+                                    min="10" 
+                                    max="500" 
+                                    value="100"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="batch-size">
+                                    批处理大小 (Batch Size)
+                                </label>
+                                <select id="batch-size" class="select-input">
+                                    <option value="16">16</option>
+                                    <option value="32" selected>32</option>
+                                    <option value="64">64</option>
+                                    <option value="128">128</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="learning-rate">
+                                    学习率 (Learning Rate)
+                                </label>
+                                <select id="learning-rate" class="select-input">
+                                    <option value="0.0001">0.0001</option>
+                                    <option value="0.0005">0.0005</option>
+                                    <option value="0.001" selected>0.001</option>
+                                    <option value="0.005">0.005</option>
+                                    <option value="0.01">0.01</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="dropout">
+                                    Dropout率
+                                </label>
+                                <div class="range-group">
+                                    <input 
+                                        type="range" 
+                                        id="dropout" 
+                                        class="range-input" 
+                                        min="0.1" 
+                                        max="0.5" 
+                                        step="0.05" 
+                                        value="0.2"
+                                    >
+                                    <span id="dropout-value" class="range-value">0.2</span>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary btn-full" id="btn-train" disabled>
+                                <span class="btn-text">开始训练</span>
+                                <span class="btn-loading" style="display:none">
+                                    <span class="spinner"></span>
+                                    训练中...
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 训练进度模块 -->
+            <section id="train-progress" class="section" style="display:none">
+                <div class="section-title">
+                    <h2>训练进度</h2>
+                    <p>实时监控模型训练状态</p>
+                </div>
+
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <h3>当前任务</h3>
+                        <span class="task-status" id="task-status">准备中...</span>
+                    </div>
+
+                    <div class="progress-stages">
+                        <div class="stage-item" id="stage-prepare">
+                            <div class="stage-icon">📊</div>
+                            <div class="stage-info">
+                                <div class="stage-title">数据准备</div>
+                                <div class="stage-desc">加载和预处理数据集</div>
+                            </div>
+                            <div class="stage-status pending">等待中</div>
+                        </div>
+
+                        <div class="stage-item" id="stage-clip">
+                            <div class="stage-icon">🔗</div>
+                            <div class="stage-info">
+                                <div class="stage-title">CLIP特征提取</div>
+                                <div class="stage-desc">提取跨模态特征向量</div>
+                            </div>
+                            <div class="stage-status pending">等待中</div>
+                        </div>
+
+                        <div class="stage-item" id="stage-bert">
+                            <div class="stage-icon">📝</div>
+                            <div class="stage-info">
+                                <div class="stage-title">BERT特征提取</div>
+                                <div class="stage-desc">提取文本语义特征</div>
+                            </div>
+                            <div class="stage-status pending">等待中</div>
+                        </div>
+
+                        <div class="stage-item" id="stage-vgg">
+                            <div class="stage-icon">🖼️</div>
+                            <div class="stage-info">
+                                <div class="stage-title">VGG特征提取</div>
+                                <div class="stage-desc">提取图像视觉特征</div>
+                            </div>
+                            <div class="stage-status pending">等待中</div>
+                        </div>
+
+                        <div class="stage-item" id="stage-reason" style="display:none">
+                            <div class="stage-icon">🧠</div>
+                            <div class="stage-info">
+                                <div class="stage-title">大模型推理特征</div>
+                                <div class="stage-desc">生成推理依据</div>
+                            </div>
+                            <div class="stage-status pending">等待中</div>
+                        </div>
+
+                        <div class="stage-item" id="stage-fusion">
+                            <div class="stage-icon">🔄</div>
+                            <div class="stage-info">
+                                <div class="stage-title">特征融合</div>
+                                <div class="stage-desc">融合多模态特征向量</div>
+                            </div>
+                            <div class="stage-status pending">等待中</div>
+                        </div>
+
+                        <div class="stage-item" id="stage-training">
+                            <div class="stage-icon">🎯</div>
+                            <div class="stage-info">
+                                <div class="stage-title">模型训练</div>
+                                <div class="stage-desc">训练分类器模型</div>
+                            </div>
+                            <div class="stage-status pending">等待中</div>
+                        </div>
+                    </div>
+
+                    <div class="training-logs">
+                        <h4>训练日志</h4>
+                        <div class="log-container" id="log-container">
+                            <div class="log-entry info">等待开始训练...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 训练监控模块 -->
+            <section id="monitor" class="section">
+                <div class="section-title">
+                    <h2>训练监控</h2>
+                    <p>可视化展示训练过程和结果</p>
+                </div>
+
+                <div class="monitor-grid">
+                    <!-- 损失曲线 -->
+                    <div class="monitor-card">
+                        <div class="card-header">
+                            <h3>损失曲线</h3>
+                            <span class="card-badge">实时</span>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="loss-chart" width="600" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 准确率曲线 -->
+                    <div class="monitor-card">
+                        <div class="card-header">
+                            <h3>准确率曲线</h3>
+                            <span class="card-badge">实时</span>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="accuracy-chart" width="600" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 评估指标 -->
+                    <div class="monitor-card">
+                        <div class="card-header">
+                            <h3>评估指标</h3>
+                            <span class="card-badge" id="best-epoch-badge">-</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="metrics-grid">
+                                <div class="metric-item">
+                                    <div class="metric-label">最佳准确率</div>
+                                    <div class="metric-value" id="metric-accuracy">-</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">最佳精确率</div>
+                                    <div class="metric-value" id="metric-precision">-</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">最佳召回率</div>
+                                    <div class="metric-value" id="metric-recall">-</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">最佳F1分数</div>
+                                    <div class="metric-value" id="metric-f1">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 训练统计 -->
+                    <div class="monitor-card">
+                        <div class="card-header">
+                            <h3>训练统计</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="stats-list">
+                                <div class="stat-row">
+                                    <span class="stat-name">当前轮次</span>
+                                    <span class="stat-data" id="stat-epoch">0 / 100</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-name">当前损失</span>
+                                    <span class="stat-data" id="stat-loss">-</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-name">训练时长</span>
+                                    <span class="stat-data" id="stat-time">00:00:00</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-name">设备</span>
+                                    <span class="stat-data" id="stat-device">-</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-name">数据集</span>
+                                    <span class="stat-data" id="stat-dataset">-</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-name">模型状态</span>
+                                    <span class="stat-data" id="stat-model-status">未训练</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 训练操作按钮 -->
+                <div class="train-actions">
+                    <button class="btn btn-warning" id="btn-pause" disabled>
+                        暂停训练
+                    </button>
+                    <button class="btn btn-danger" id="btn-stop" disabled>
+                        停止训练
+                    </button>
+                    <button class="btn btn-success" id="btn-export" disabled>
+                        导出模型
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 底部 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 多模态谣言检测系统 | 大学生创新训练项目</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="{{ url_for('static', filename='js/train.js') }}"></script>
+</body>
+</html>
