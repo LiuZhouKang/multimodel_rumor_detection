@@ -56,7 +56,7 @@ except Exception:
 # ======================================================================
 
 # 导入项目原有模块
-from model_and_train import BinaryClassifier
+from backend.model_and_train import BinaryClassifier
 
 # 配置日志
 logging.basicConfig(
@@ -959,7 +959,7 @@ def api_prepare_data():
         
         # 构建命令参数
         cmd_args = [
-            'python', 'data_prepare.py',
+            'python', 'backend/data_prepare.py',
             '--ratio', str(ratio),
             '--data_from', data_from
         ]
@@ -1002,7 +1002,7 @@ def api_extract_clip():
         
         import subprocess
         result = subprocess.run(
-            ['python', 'clip_feature_process.py', '--data_from', data_from],
+            ['python', 'backend/clip_feature_process.py', '--data_from', data_from],
             capture_output=True,
             text=True,
             encoding='utf-8',
@@ -1028,7 +1028,7 @@ def api_extract_bert():
         
         import subprocess
         result = subprocess.run(
-            ['python', 'bert_feature_process.py', '--data_from', data_from],
+            ['python', 'backend/bert_feature_process.py', '--data_from', data_from],
             capture_output=True,
             text=True,
             encoding='utf-8',
@@ -1054,7 +1054,7 @@ def api_extract_vgg():
         
         import subprocess
         result = subprocess.run(
-            ['python', 'vgg_feature_process.py', '--data_from', data_from],
+            ['python', 'backend/vgg_feature_process.py', '--data_from', data_from],
             capture_output=True,
             text=True,
             encoding='utf-8',
@@ -1080,7 +1080,7 @@ def api_extract_fusion():
         
         import subprocess
         result = subprocess.run(
-            ['python', 'get_mixed_feature.py', '--data_from', data_from],
+            ['python', 'backend/get_mixed_feature.py', '--data_from', data_from],
             capture_output=True,
             text=True,
             encoding='utf-8',
@@ -1110,7 +1110,7 @@ def api_extract_reason():
         
         # 构建命令行参数（使用参数传递API Key，避免修改源文件触发服务器重启）
         cmd_args = [
-            'python', 'judge_by_bigmodal.py',
+            'python', 'backend/judge_by_bigmodal.py',
             '--data_from', data_from,
             '--model_provider', model_provider
         ]
@@ -1142,7 +1142,7 @@ def api_extract_reason():
                     
                     # 处理推理特征
                     result2 = subprocess.run(
-                        ['python', 'reason_feature_process.py', '--data_from', data_from],
+                        ['python', 'backend/reason_feature_process.py', '--data_from', data_from],
                         capture_output=True,
                         text=True,
                         encoding='utf-8',
@@ -1200,7 +1200,7 @@ def api_start_training():
                 socketio.emit('training_progress', {'stage': 'fusion', 'status': 'running', 'message': '融合中...'})
                 
                 result = subprocess.run(
-                    ['python', 'get_mixed_feature.py', '--data_from', data_from],
+                    ['python', 'backend/get_mixed_feature.py', '--data_from', data_from],
                     capture_output=True,
                     text=True,
                     encoding='utf-8',
@@ -1222,7 +1222,7 @@ def api_start_training():
                 
                 # 使用命令行参数传递训练配置，避免修改文件触发Flask自动重载
                 train_cmd = [
-                    'python', 'model_and_train.py',
+                    'python', 'backend/model_and_train.py',
                     '--epochs', str(epochs),
                     '--lr', str(learning_rate),
                     '--batch_size', str(batch_size),

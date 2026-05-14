@@ -127,28 +127,31 @@ pip install -r requirement.txt
 
 ```bash
 # 1. 图像修复（可选）
-python image_repair.py --input image-verification-corpus/images --output repaired_images
+python backend/image_repair.py --input image-verification-corpus/images --output repaired_images
 
 # 2. 数据集预处理
-python data_prepare.py --ratio 0.2 --data_from weibo
+python backend/data_prepare.py --ratio 0.2 --data_from weibo
 
 # 3. 提取CLIP特征
-python clip_feature_process.py --data_from weibo
+python backend/clip_feature_process.py --data_from weibo
 
-# 4. 提取VGG和BERT特征
-python normal_feature_process.py --data_from weibo
+# 4. 提取BERT特征
+python backend/bert_feature_process.py --data_from weibo
 
-# 5. 调用大模型API进行推理分析
-python judge_by_bigmodal.py --data_from weibo
+# 5. 提取VGG特征
+python backend/vgg_feature_process.py --data_from weibo
 
-# 6. 处理推理结果获取特征
-python reason_feature_process.py --data_from weibo
+# 6. 调用大模型API进行推理分析
+python backend/judge_by_bigmodal.py --data_from weibo
 
-# 7. 特征融合
-python get_mixed_feature.py --data_from weibo
+# 7. 处理推理结果获取特征
+python backend/reason_feature_process.py --data_from weibo
 
-# 8. 模型训练与测试
-python model_and_train.py
+# 8. 特征融合
+python backend/get_mixed_feature.py --data_from weibo
+
+# 9. 模型训练与测试
+python backend/model_and_train.py
 ```
 
 ## 参数说明
