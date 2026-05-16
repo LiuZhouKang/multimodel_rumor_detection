@@ -115,6 +115,7 @@ if __name__ == "__main__":
     test_image_reason_feature, _ = extract_text_features(test_image_reason, data_from=args.data_from)
 
     # 保存四个列表为 .npy 文件（只保存特征矩阵，不保存损失）
+    os.makedirs("~/multimodel_rumor_detection/reason_feature", exist_ok=True)
     np.save('~/multimodel_rumor_detection/reason_feature/train_text_reason_feature.npy', train_text_reason_feature.numpy())
     np.save('~/multimodel_rumor_detection/reason_feature/test_text_reason_feature.npy', test_text_reason_feature.numpy())
     np.save('~/multimodel_rumor_detection/reason_feature/train_image_reason_feature.npy', train_image_reason_feature.numpy())

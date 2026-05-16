@@ -35,8 +35,16 @@ BATCH_SIZE = args.batch_size
 MODEL_PROVIDER = args.model_provider
 
 # API Keys配置
-ZHIPU_API_KEY = args.api_key if args.api_key else '33b4969db86e4599a8b47a61e2125a0a.WtHV4Q6OjGKXbytd'
-QWEN_API_KEY = args.api_key if args.api_key else 'sk-4ba3868d640749f19300ff010ff50a42'
+ZHIPU_API_KEY = args.api_key if args.api_key else ''
+QWEN_API_KEY = args.api_key if args.api_key else ''
+
+# 检查API密钥是否已提供
+if not ZHIPU_API_KEY and MODEL_PROVIDER == 'zhipu':
+    print("错误：未提供智谱AI API密钥。请通过 --api_key 参数提供API密钥。")
+    exit(1)
+elif not QWEN_API_KEY and MODEL_PROVIDER == 'qwen':
+    print("错误：未提供通义千问API密钥。请通过 --api_key 参数提供API密钥。")
+    exit(1)
 
 # 初始化对应客户端
 if MODEL_PROVIDER == 'zhipu':
@@ -203,9 +211,6 @@ if __name__ == "__main__":
     judge(train_image_path, is_text=False, is_train=True, data_from=data_from)
     print("---------------4.处理测试集中图像部分数据---------------")
     judge(test_image_path, is_text=False, is_train=False, data_from=data_from)
-
-    # 确保目录存在
-    os.makedirs('reason_content', exist_ok=True)
 
     # 确保目录存在
     os.makedirs("~/multimodel_rumor_detection/reason_content", exist_ok=True)

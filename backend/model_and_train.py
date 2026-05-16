@@ -92,6 +92,7 @@ if __name__ == "__main__":
     print(f'F1 Score: {best_metrics["f1"]:.4f}')
     
     # 保存最佳模型到文件
+    os.makedirs("~/multimodel_rumor_detection", exist_ok=True)
     torch.save(best_model_state, '~/multimodel_rumor_detection/best_model.pth')
     print(f'\n模型已保存到: ~/multimodel_rumor_detection/best_model.pth')
     
